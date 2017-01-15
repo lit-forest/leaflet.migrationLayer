@@ -1,5 +1,5 @@
 # leaflet.od
-迁徙图数据可视化,用于人口迁移，物流信息展示   
+迁徙图数据可视化,用于人口迁移，物流信息展示，Origin to Deatination   
 <div style="text-align:center" align="center">
   <img src="https://react-map.github.io/leaflet.od/demo.gif" />
 </div>     
@@ -44,7 +44,7 @@ odlayer.pause();
 ```js
 odlayer.play();
 ```   
-8.彻底展示odLayer图层     
+8.彻底删除odLayer图层     
 ```js
 odlayer.destroy();
 ```   
