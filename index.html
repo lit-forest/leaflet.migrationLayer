@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>OD</title>
+    <link rel="stylesheet" href="./lib/leaflet.css" />
+    <style>
+    html,body{
+        margin: 0;
+        padding: 0;
+    }
+    #map{
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+    #event{
+        position: absolute;
+        top: 50px;
+        right: 50px;
+        height: 100px;
+        width: 400px;
+        z-index: 10000;
+    }
+    .btn{
+        border-color: lawngreen;
+        border-width: 2px;
+        background-color: lightseagreen;
+   }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id='event'>
+        <input type="button" value="setData" class="btn" onclick="setData()">
+        <input type="button" value="hide" class="btn" onclick="hide()">
+        <input type="button" value="show" class="btn" onclick="show()">
+        <input type="button" value="play" class="btn" onclick="play()">
+        <input type="button" value="pause" class="btn" onclick="pause()">
+        <input type="button" value="destroy" class="btn" onclick="destroy()">
+    </div>
+    <script src="./lib/leaflet.js"></script>
+    <script src='./dist/leaflet.od.js'></script>
+    <script>
+        var lrmap = L.map('map').setView([31, 115], 5);
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(lrmap);
+
+
+        var data = '[{"from":[113.26627,23.13171],"to":[108.32754,22.81521],"labels":["广州","广西"],"color":"#ff3a31"},{"from":[113.26627,23.13171],"to":[112.9834,28.11266],"labels":[null,"湖南"],"color":"#ff7e2b"},{"from":[113.26627,23.13171],"to":[115.91004,28.67417],"labels":[null,"江西"],"color":"#ffc726"},{"from":[113.26627,23.13171],"to":[114.34234,30.54539],"labels":[null,"湖北"],"color":"#e9ff20"},{"from":[113.26627,23.13171],"to":[119.29659,26.09982],"labels":[null,"福建"],"color":"#99ff1b"},{"from":[113.26627,23.13171],"to":[106.70722,26.5982],"labels":[null,"贵州"],"color":"#45ff15"},{"from":[113.26627,23.13171],"to":[104.07572,30.65089],"labels":[null,"四川"],"color":"#10ff33"},{"from":[113.26627,23.13171],"to":[120.1536,30.26555],"labels":[null,"浙江"],"color":"#0aff84"},{"from":[113.26627,23.13171],"to":[121.4737,31.23037],"labels":[null,"上海"],"color":"#05ffd9"},{"from":[113.26627,23.13171],"to":[113.75322,34.76571],"labels":[null,"河南"],"color":"#00ccff"}]';
+        var data2='[{"from":[100.26627,12.13171],"to":[108.32754,22.81521],"labels":["广州","广西"],"color":"#ff3a31"},{"from":[100.26627,12.13171],"to":[112.9834,28.11266],"labels":[null,"湖南"],"color":"#ff7e2b"},{"from":[100.26627,12.13171],"to":[115.91004,28.67417],"labels":[null,"江西"],"color":"#ffc726"},{"from":[100.26627,12.13171],"to":[114.34234,30.54539],"labels":[null,"湖北"],"color":"#e9ff20"},{"from":[100.26627,12.13171],"to":[119.29659,26.09982],"labels":[null,"福建"],"color":"#99ff1b"},{"from":[100.26627,12.13171],"to":[106.70722,26.5982],"labels":[null,"贵州"],"color":"#45ff15"},{"from":[100.26627,12.13171],"to":[104.07572,30.65089],"labels":[null,"四川"],"color":"#10ff33"},{"from":[100.26627,12.13171],"to":[120.1536,30.26555],"labels":[null,"浙江"],"color":"#0aff84"},{"from":[100.26627,12.13171],"to":[121.4737,31.23037],"labels":[null,"上海"],"color":"#05ffd9"},{"from":[100.26627,12.13171],"to":[113.75322,34.76571],"labels":[null,"河南"],"color":"#00ccff"}]';
+
+        var odlayer = new L.od({
+            map: lrmap,
+            data: JSON.parse(data)
+        });
+        odlayer.addTo(lrmap);
+        function setData(){
+            odlayer.setData(JSON.parse(data2));
+        }
+        function hide(){
+            odlayer.hide();
+        }
+        function show(){
+            odlayer.show();
+        }
+        function play(){
+            odlayer.play();
+        }
+        function pause(){
+            odlayer.pause();
+        }
+        function destroy() {
+            odlayer.destroy();
+        }
+    </script>
+</body>
+
+</html>
