@@ -1,6 +1,8 @@
 # leaflet.od
 迁徙图数据可视化,用于人口迁移，物流信息展示   
-     
+<div style="text-align:center" align="center">
+  <img src="https://react-map.github.io/leaflet.od/demo.gif" />
+</div>     
 ##supported browsers
 Internet Explorer 10+     
 Google Chrome     
@@ -19,7 +21,7 @@ A demo is available on the Github Pages webpage for leaflet.od [Check out demo!]
 ```js
 var odlayer = new L.od({
     map: map,
-    data: JSON.parse(data)
+    data: data
 })
 ```     
 3.更新数据或者发送新的数据到odLayer
