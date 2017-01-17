@@ -1,5 +1,5 @@
 # leaflet.migrationLayer
-Leafet.Migration is used to show migration data such as population, flight, vehicle and so on.Data visualization on map
+Leafet.Migration is used to show migration data such as population,flight,vehicle,traffic and so on.Data visualization on map
 <div style="text-align:center" align="center">
   <img src="https://react-map.github.io/leaflet.migrationLayer/demo.gif" />
 </div>     
@@ -10,7 +10,7 @@ Safari
 Firefox        
 
 ##Demo online   
-A demo is available on the Github Pages webpage for leaflet.od [Check out demo!](https://react-map.github.io/leaflet.migrationLayer/).
+A demo is available on the Github Pages webpage for leaflet.migrationLayer [Check out demo!](https://react-map.github.io/leaflet.migrationLayer/).
 
 ##Usage     
 1.Include the JavaScript files located in ```\dist``` directory.
