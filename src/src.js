@@ -87,7 +87,6 @@
                 startY = options.startY,
                 endX = options.endX,
                 endY = options.endY;
-
             //两点之间的圆有多个，通过两点及半径便可以定出两个圆，根据需要选取其中一个圆
             var L = Math.sqrt(Math.pow(startX - endX, 2) + Math.pow(startY - endY, 2));
             var m = (startX + endX) / 2; // 横轴中点
@@ -112,11 +111,11 @@
             this.endAngle = endAngle;
             this.startLabel = options && options.labels && options.labels[0],
                 this.endLabel = options && options.labels && options.labels[1],
-                console.log(this.startLabel);
-            console.log(this.endLabel);
-            this.radius = radius;
+                this.radius = radius;
             this.lineWidth = options.width || 1;
             this.strokeStyle = options.color || '#000';
+            this.label = options.label;
+            this.font = options.font;
             this.shadowBlur = options.shadowBlur;
         };
 
@@ -134,16 +133,18 @@
 
             context.save();
             context.fillStyle = this.strokeStyle;
-            context.font = "15px sans-serif";
-            if (this.startLabel) {
-                var x = this.startX - 15
-                var y = this.startY + 5
-                context.fillText(this.startLabel, x, y);
-            }
-            if (this.endLabel) {
-                var x = this.endX - 15;
-                var y = this.endY - 5;
-                context.fillText(this.endLabel, x, y);
+            if (this.label) {
+                context.font = this.label;
+                if (this.startLabel) {
+                    var x = this.startX - 15
+                    var y = this.startY + 5
+                    context.fillText(this.startLabel, x, y);
+                }
+                if (this.endLabel) {
+                    var x = this.endX - 15;
+                    var y = this.endY - 5;
+                    context.fillText(this.endLabel, x, y);
+                }
             }
             context.restore();
         };
@@ -226,8 +227,8 @@
             this.startAngle = startAngle;
             this.endAngle = endAngle;
             this.radius = radius;
-            this.lineWidth = options.width || 5;
-            this.strokeStyle = options.color || '#000';
+            this.lineWidth = options.width || 1;
+            this.strokeStyle = options.color || '#fff';
             this.factor = 2 / this.radius;
             this.deltaAngle = (80 / Math.min(this.radius, 400)) / this.tailPointsCount;
             this.trailAngle = this.startAngle;
@@ -318,7 +319,7 @@
             this.playAnimation = true;
             this.started = false;
             this.context = options.context;
-
+            this.style = options.style;
             this.init();
         };
 
@@ -364,7 +365,9 @@
                         endX: element.to[0],
                         endY: element.to[1],
                         labels: element.labels,
-                        width: 1,
+                        label: this.style.arc.label,
+                        font: this.style.arc.font,
+                        width: this.style.arc.width,
                         color: element.color
                     });
                     var marker = new Marker({
@@ -380,9 +383,9 @@
                     var pulse = new Pulse({
                         x: element.to[0],
                         y: element.to[1],
-                        radius: 25,
+                        radius: this.style.pulse.radius,
                         color: element.color,
-                        borderWidth: 3
+                        borderWidth: this.style.pulse.borderWidth
                     });
                     var spark = new Spark({
                         startX: element.from[0],
@@ -431,15 +434,45 @@
         return M;
     })();
 
-    L.OD = L.Class.extend({
+    L.MigrationLayer = L.Class.extend({
         options: {
             map: {},
-            data: {}
+            data: {},
+            pulseRadius: 25,
+            pulseBorderWidth: 3,
+            arcWidth: 1,
+            arcLabel: true,
+            arcLabelFont: '15px sans-serif',
+            Marker: {},
+            Spark: {}
+
+        },
+        _setOptions: function (obj, options) {
+            console.log(obj)
+            if (!obj.hasOwnProperty('options')) {
+                obj.options = obj.options ? L.Util.create(obj.options) : {};
+            }
+            for (var i in options) {
+                obj.options[i] = options[i];
+            }
+            return obj.options;
         },
         initialize: function (options) {
-            L.setOptions(this, options);
+            console.log(this)
+            this._setOptions(this, options);
             this._map = this.options.map || {};
             this._data = this.options.data || {};
+            this._style = {
+                pulse: {
+                    radius: this.options.pulseRadius,
+                    borderWidth: this.options.pulseBorderWidth
+                },
+                arc: {
+                    width: this.options.arcWidth,
+                    label: this.options.arcLabel,
+                    font: this.options.arcLabelFont
+                }
+            } || {};
             this._show = true;
             this._init();
         },
@@ -460,7 +493,8 @@
                 var data = this._convertData();
                 this.migration = new Migration({
                     data: data,
-                    context: this.context
+                    context: this.context,
+                    style: this._style
                 });
                 //this._draw();
                 //this._bindMapEvents();
@@ -581,7 +615,7 @@
         }
 
     });
-    L.od = function (options) {
-        return new L.OD(options)
+    L.migrationLayer = function (options) {
+        return new L.MigrationLayer(options)
     }
 })(window)

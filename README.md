@@ -1,7 +1,7 @@
-# leaflet.od
-迁徙图数据可视化,用于人口迁移，物流信息展示，Origin to Deatination   
+# leaflet.migrationLayer
+Leafet.Migration is used to show migration data such as population, flight, vehicle and so on.Data visualization on map
 <div style="text-align:center" align="center">
-  <img src="https://react-map.github.io/leaflet.od/demo.gif" />
+  <img src="https://react-map.github.io/leaflet.migrationLayer/demo.gif" />
 </div>     
 ##supported browsers
 Internet Explorer 10+     
@@ -10,43 +10,55 @@ Safari
 Firefox        
 
 ##Demo online   
-A demo is available on the Github Pages webpage for leaflet.od [Check out demo!](https://react-map.github.io/leaflet.od/).
+A demo is available on the Github Pages webpage for leaflet.od [Check out demo!](https://react-map.github.io/leaflet.migrationLayer/).
 
 ##Usage     
-1.添加leaflet.od源代码到页面
+1.Include the JavaScript files located in ```\dist``` directory.
 ```html
-<script src="./dist/leaflet.od.js"></script>
+<script src="./dist/leaflet.migrationLayer.js"></script>
 ```    
-2.创建一个odLayer
+2.Create a new migrationLayer
 ```js
-var odlayer = new L.od({
+var migrationLayer = new L.migrationLayer({
     map: map,
     data: data
 })
 ```     
-3.更新数据或者发送新的数据到odLayer
+3.update or set data to migrationLayer
 ```js
-odlayer.setData(newData);
+migrationLayer.setData(newData);
 ```   
-4.隐藏odLayer图层       
+4.hide migrationLayer       
 ```js
-odlayer.hide();
+migrationLayer.hide();
 ```   
-5.显示odlayer图层       
+5.show migrationLayer       
 ```js
-odlayer.show();
+migrationLayer.show();
 ```   
-6.暂停动画效果   
+6.pause migrationLayer animation  
 ```js
-odlayer.pause();
+migrationLayer.pause();
 ```   
-7.播放动画效果     
+7.play migrationLayer animation
 ```js
-odlayer.play();
+migrationLayer.play();
 ```   
-8.彻底删除odLayer图层     
+8.destroy migrationLayer     
 ```js
-odlayer.destroy();
+migrationLayer.destroy();
 ```   
+
+##Options   
+| option          | Description            | Default Value    | Possible  values         | Required       |
+| --------------- | ---------------------- | -----------------| ------------------------ | -------------- | 
+| map             | the map obj            |                  | <Map>                    | yes            |
+| data            | data for migrationLayer|                  | <Json>                   | yes            | 
+| pulseRadius     | the pulse radius       | 25               | any number>0             | no             |
+| pulseBorderWidth| pulse border width     | 3                | any number>0             | no             |
+| arcWidth        | arc width              | 1                | any number>0             | no             |
+| arcLabel        | show from and to label | true             | <Bool>                   | no             |
+| arcLabelFont    | label font and size    | '15px sans-serif'| 'size font'              | no             |   
+
 ## License   
 MIT.    
