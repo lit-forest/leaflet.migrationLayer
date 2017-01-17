@@ -61,7 +61,7 @@ migrationLayer.destroy();
 | arcLabelFont    | label font and size    | '15px sans-serif'| 'size font'              | no             |   
 
 ## Leaflet Version     
-Requires Leaflet 0.7.0 or newer   
+Requires Leaflet 1.0.2 or newer   
 
 ## License   
 MIT.    
