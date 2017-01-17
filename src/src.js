@@ -448,7 +448,6 @@
 
         },
         _setOptions: function (obj, options) {
-            console.log(obj)
             if (!obj.hasOwnProperty('options')) {
                 obj.options = obj.options ? L.Util.create(obj.options) : {};
             }
@@ -458,7 +457,6 @@
             return obj.options;
         },
         initialize: function (options) {
-            console.log(this)
             this._setOptions(this, options);
             this._map = this.options.map || {};
             this._data = this.options.data || {};
@@ -505,7 +503,6 @@
             var topleft = bounds.getNorthWest();
             var topLeftscreen = this._map.latLngToContainerPoint(topleft);
             //当地图缩放或者平移到整个地图的范围小于外层容器的范围的时候，要对this.container进行上下平移操作，反之则回归原位
-            console.log(topLeftscreen.y)
             if (topLeftscreen.y > 0) {
                 this.container.style.top = -topLeftscreen.y + 'px';
             } else {
@@ -545,13 +542,11 @@
             //     that.migration.pause();
             // });
             this._map.on('moveend', function () {
-                console.log('move')
                 that.migration.play();
                 that._draw();
             });
             this._map.on('zoomstart ', function () { that.container.style.display = 'none' });
             this._map.on('zoomend', function () {
-                console.log(this._show)
                 if (that._show) {
                     that.container.style.display = ''
                     that._draw();
@@ -563,7 +558,6 @@
             if (bounds && this.migration.playAnimation) {
                 this._resize();
                 this._transform();
-
                 var data = this._convertData();
                 this.migration.updateData(data);
                 this.migration.start(this.canvas);
@@ -572,7 +566,6 @@
         _transform: function () {
             var bounds = this._map.getBounds();
             var topLeft = this._map.latLngToLayerPoint(bounds.getNorthWest());
-            //console.log(topLeft);
             L.DomUtil.setPosition(this.container, topLeft);
         },
         addTo: function () {
