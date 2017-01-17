@@ -49,7 +49,7 @@ migrationLayer.play();
 migrationLayer.destroy();
 ```   
 
-##Options   
+##API(options)   
 | option          | Description            | Default Value    | Possible  values         | Required       |
 | --------------- | ---------------------- | -----------------| ------------------------ | -------------- | 
 | map             | the map obj            | null             | Map                      | yes            |
@@ -59,6 +59,9 @@ migrationLayer.destroy();
 | arcWidth        | arc width              | 1                | any number>0             | no             |
 | arcLabel        | show from and to label | true             | Bool                     | no             |
 | arcLabelFont    | label font and size    | '15px sans-serif'| 'size font'              | no             |   
+
+## Leaflet Version     
+Requires Leaflet 0.7.0 or newer   
 
 ## License   
 MIT.    
