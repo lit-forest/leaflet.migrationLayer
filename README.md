@@ -3,16 +3,16 @@ leafet.migrationLayer is used to show migration data such as population,flight,v
 <div style="text-align:center" align="center">
   <img src="https://react-map.github.io/leaflet.migrationLayer/demo.gif" />
 </div>     
-##supported browsers
+## Supported Browsers
 Internet Explorer 10+     
 Google Chrome     
 Safari    
 Firefox        
 
-##Demo online   
+## Demo online   
 A demo is available on the Github Pages webpage for leaflet.migrationLayer [Check out demo!](https://react-map.github.io/leaflet.migrationLayer/).
 
-##Usage     
+## Usage     
 1.Include the JavaScript files located in ```\dist``` directory.
 ```html
 <script src="./dist/leaflet.migrationLayer.js"></script>
@@ -49,7 +49,8 @@ migrationLayer.play();
 migrationLayer.destroy();
 ```   
 
-##API(options)   
+## API(options)   
+
 | option          | Description            | Default Value    | Possible  values         | Required       |
 | --------------- | ---------------------- | -----------------| ------------------------ | -------------- | 
 | map             | the map obj            | null             | Map                      | yes            |
