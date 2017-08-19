@@ -2,8 +2,9 @@
 leafet.migrationLayer is used to show migration data such as population,flight,vehicle,traffic and so on.Data visualization on map.
 <div style="text-align:center" align="center">
   <img src="https://react-map.github.io/leaflet.migrationLayer/demo.gif" />
-</div>     
-## Supported Browsers
+</div>
+
+## Supported Browsers   
 Internet Explorer 10+     
 Google Chrome     
 Safari    
