@@ -11,7 +11,7 @@ Safari
 Firefox        
 
 ## Demo online   
-A demo is available on the Github Pages webpage for leaflet.migrationLayer [Check out demo!](https://react-map.github.io/leaflet.migrationLayer/).
+A demo is available on the Github Pages webpage for leaflet.migrationLayer [Check out demo!](https://sylvenas.github.io/leaflet.migrationLayer/).
 
 ## Usage     
 1.Include the JavaScript files located in ```\dist``` directory.
