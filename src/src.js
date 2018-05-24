@@ -134,7 +134,7 @@
             context.save();
             context.fillStyle = this.strokeStyle;
             if (this.label) {
-                context.font = this.label;
+                context.font = this.font;
                 if (this.startLabel) {
                     var x = this.startX - 15
                     var y = this.startY + 5
