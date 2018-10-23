@@ -66,11 +66,12 @@
             if (this.style === 'circle') {
                 context.arc(0, 0, this.size, 0, Math.PI * 2, false);
             } else if (this.style === 'arrow') {
-                context.moveTo(-this.size, -this.size);
-                context.lineTo(this.size, 0);
-                context.lineTo(-this.size, this.size);
-                context.lineTo(-this.size / 4, 0);
-                context.lineTo(-this.size, -this.size);
+                // 将箭头后退，让箭头的尖头指向终点
+                context.moveTo(-this.size*2, -this.size);
+                context.lineTo(-this.size*5/4, 0);
+                context.lineTo(-this.size*2, this.size);
+                context.lineTo(0, 0);
+                context.lineTo(-this.size*2, -this.size);
             }
             context.closePath();
             context.stroke();
@@ -117,6 +118,7 @@
             this.label = options.label;
             this.font = options.font;
             this.shadowBlur = options.shadowBlur;
+            this.endAngle = endAngle - this.lineWidth / radius; // 让线后退，与箭头结合
         };
 
         A.prototype.draw = function (context) {
@@ -236,14 +238,15 @@
 
             this.animateBlur = true;
 
+            const size = options.size? options.size/2:1
             this.marker = new Marker({
                 x: 50,
                 y: 80,
                 rotation: 50 * Math.PI / 180,
                 style: 'arrow',
                 color: 'rgb(255, 255, 255)',
-                size: 3,
-                borderWidth: 0,
+                size: size+1,
+                borderWidth: size ,
                 borderColor: this.strokeStyle
             });
         };
@@ -367,7 +370,7 @@
                         labels: element.labels,
                         label: this.style.arc.label,
                         font: this.style.arc.font,
-                        width: this.style.arc.width,
+                        width: element.arcWidth || this.style.arc.width,
                         color: element.color
                     });
                     var marker = new Marker({
@@ -376,7 +379,7 @@
                         rotation: arc.endAngle + Math.PI / 2,
                         style: 'arrow',
                         color: element.color,
-                        size: 4,
+                        size: element.arcWidth || this.style.arc.width+3,
                         borderWidth: 0,
                         borderColor: element.color
                     });
@@ -393,7 +396,8 @@
                         endX: element.to[0],
                         endY: element.to[1],
                         width: 15,
-                        color: element.color
+                        color: element.color,
+                        size: element.arcWidth
                     });
 
                     this.store.arcs.push(arc);
@@ -515,9 +519,37 @@
         },
         _convertData: function () {
             var bounds = this._map.getBounds();
-
+            let maxValue;
+            let minValue
             if (this._data && bounds) {
+                arrayUtils.forEach(this._data, function (d) {
+                    if(d.value){
+                        if(!maxValue){
+                            maxValue = d.value;
+                            minValue = d.value;
+                        }
+                        if(maxValue<d.value){
+                            maxValue = d.value;
+                        }
+                        if(minValue>d.value){
+                            minValue = d.value;
+                        }
+                    }
+                });
+                var maxWidth = this.options.maxWidth || 10;
                 var data = arrayUtils.map(this._data, function (d) {
+                    if(d.value){
+                        if(!maxValue){
+                            maxValue = d.value;
+                            minValue = d.value;
+                        }
+                        if(maxValue<d.value){
+                            maxValue = d.value;
+                        }
+                        if(minValue>d.value){
+                            minValue = d.value;
+                        }
+                    }
 
                     var fromPixel = this._map.latLngToContainerPoint(new L.LatLng(d.from[1], d.from[0]));
                     var toPixel = this._map.latLngToContainerPoint(new L.LatLng(d.to[1], d.to[0]));
@@ -526,9 +558,13 @@
                         to: [toPixel.x, toPixel.y],
                         labels: d.labels,
                         value: d.value,
-                        color: d.color
+                        color: d.color,
+                        arcWidth: d.value? parseInt((d.value - minValue) * (maxWidth-1)/(maxValue - minValue)) + 1:this.options.arcWidth
                     }
                 }, this);
+
+                
+
 
                 return data;
             }

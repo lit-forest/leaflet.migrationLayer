@@ -60,7 +60,16 @@ migrationLayer.destroy();
 | pulseBorderWidth| pulse border width     | 3                | any number>0             | no             |
 | arcWidth        | arc width              | 1                | any number>0             | no             |
 | arcLabel        | show from and to label | true             | Bool                     | no             |
-| arcLabelFont    | label font and size    | '15px sans-serif'| 'size font'              | no             |   
+| arcLabelFont    | label font and size    | '15px sans-serif'| 'size font'              | no             |
+| maxWidth        | the max width of arc   | 10               | any number>1             | no             |
+
+## data format
+
+```js
+data = [{"from":[-118.2705,33.9984],"to":[-122.789336,37.920458],"labels":["Los Angeles","San Francisco"],"color":"#ff3a31","value":15}];
+```
+
+If the value is not undefined, the width of arc will depend on the value.
 
 ## Leaflet Version     
 Requires Leaflet 1.0.2 or newer   
