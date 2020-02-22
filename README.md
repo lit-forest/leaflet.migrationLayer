@@ -1,5 +1,5 @@
 # leaflet.migrationLayer
-leafet.migrationLayer is used to show migration data such as population,flight,vehicle,traffic and so on.Data visualization on map.
+leafet.migrationLayer is used to show migration data such as population, flight, vehicle, traffic and so on. Data visualization on map.
 
 ![demo-gif](https://p1.music.126.net/QLV26j7y2wI36Wj0F9rdUQ==/109951164732279410.gif)
 
