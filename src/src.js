@@ -577,17 +577,20 @@
             // this._map.on('movestart ', function () {
             //     that.migration.pause();
             // });
-            this._map.on('moveend', function () {
+            if(!this._map.listens("moveend"))
+              this._map.on('moveend', function () {
                 that.migration.play();
                 that._draw();
-            });
-            this._map.on('zoomstart ', function () { that.container.style.display = 'none' });
-            this._map.on('zoomend', function () {
+              });
+            if(!this._map.listens('zoomstart'))
+              this._map.on('zoomstart ', function () { that.container.style.display = 'none' });
+            if(!this._map.listens('zoomend'))
+              this._map.on('zoomend', function () {
                 if (that._show) {
-                    that.container.style.display = ''
-                    that._draw();
+                  that.container.style.display = ''
+                  that._draw();
                 }
-            });
+              });
         },
         _draw: function () {
             var bounds = this._map.getBounds();
@@ -639,8 +642,8 @@
             //移除dom
             this.container.parentNode.removeChild(this.container);
             //移除事件监听
-            this._map.clearAllEventListeners();
-            this.mapHandles = [];
+            //this._map.clearAllEventListeners();
+            //this.mapHandles = [];
         }
 
     });
