@@ -489,7 +489,7 @@
             this.canvas = document.createElement('canvas');
             this.context = this.canvas.getContext('2d');
             container.appendChild(this.canvas);
-            this._map.getPanes().overlayPane.appendChild(container);
+            //this._map.getPanes().overlayPane.appendChild(container);
             //this._resize();
             if (!this.migration) {
                 var data = this._convertData();
@@ -615,6 +615,7 @@
         },
         addTo: function () {
             this._bindMapEvents();
+            this._map.getPanes().overlayPane.appendChild(this.container);
             var bounds = this._map.getBounds();
             if (bounds && this.migration.playAnimation) {
                 this._resize();
