@@ -489,7 +489,7 @@
             this.canvas = document.createElement('canvas');
             this.context = this.canvas.getContext('2d');
             container.appendChild(this.canvas);
-            //this._map.getPanes().overlayPane.appendChild(container);
+            this._map.getPanes().overlayPane.appendChild(container);
             //this._resize();
             if (!this.migration) {
                 var data = this._convertData();
@@ -577,26 +577,17 @@
             // this._map.on('movestart ', function () {
             //     that.migration.pause();
             // });
-            if(!this._map.listens("moveend")){
-              this._map.on('moveend', function () {
+            this._map.on('moveend', function () {
                 that.migration.play();
                 that._draw();
-              });
-            }
-              
-            if(!this._map.listens('zoomstart')){
-              this._map.on('zoomstart ', function () { that.container.style.display = 'none' });
-            }
-              
-            if(!this._map.listens('zoomend')){
-              this._map.on('zoomend', function () {
+            });
+            this._map.on('zoomstart ', function () { that.container.style.display = 'none' });
+            this._map.on('zoomend', function () {
                 if (that._show) {
-                  that.container.style.display = ''
-                  that._draw();
+                    that.container.style.display = ''
+                    that._draw();
                 }
-              });
-            }
-             
+            });
         },
         _draw: function () {
             var bounds = this._map.getBounds();
@@ -615,7 +606,6 @@
         },
         addTo: function () {
             this._bindMapEvents();
-            this._map.getPanes().overlayPane.appendChild(this.container);
             var bounds = this._map.getBounds();
             if (bounds && this.migration.playAnimation) {
                 this._resize();
@@ -649,7 +639,7 @@
             //移除dom
             this.container.parentNode.removeChild(this.container);
             //移除事件监听
-            //this._map.clearAllEventListeners();
+            this._map.clearAllEventListeners();
             this.mapHandles = [];
         }
 
