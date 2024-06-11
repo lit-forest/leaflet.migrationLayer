@@ -119,6 +119,7 @@
             this.font = options.font;
             this.shadowBlur = options.shadowBlur;
             this.endAngle = endAngle - this.lineWidth / radius; // 让线后退，与箭头结合
+            this.labelsToDraw = options && options.labelsOptions;
         };
 
         A.prototype.draw = function (context) {
@@ -137,15 +138,17 @@
             context.fillStyle = this.strokeStyle;
             if (this.label) {
                 context.font = this.font;
-                if (this.startLabel) {
-                    var x = this.startX - 15
-                    var y = this.startY + 5
-                    context.fillText(this.startLabel, x, y);
-                }
-                if (this.endLabel) {
-                    var x = this.endX - 15;
-                    var y = this.endY - 5;
-                    context.fillText(this.endLabel, x, y);
+                if (this.labelsToDraw > 0) {
+                    if (this.startLabel && this.labelsToDraw % 2 > 0) {
+                        var x = this.startX - 15
+                        var y = this.startY + 5
+                        context.fillText(this.startLabel, x, y);
+                    }
+                    if (this.endLabel && this.labelsToDraw > 1) {
+                        var x = this.endX - 15;
+                        var y = this.endY - 5;
+                        context.fillText(this.endLabel, x, y);
+                    }
                 }
             }
             context.restore();
@@ -319,6 +322,7 @@
                 pulses: [],
                 sparks: []
             };
+            this.uniqueArcsLabels = [];
             this.playAnimation = true;
             this.started = false;
             this.context = options.context;
@@ -345,6 +349,7 @@
                 pulses: [],
                 sparks: []
             };
+            this.uniqueArcsLabels = [];
             // 更新状态
             this.playAnimation = true;
             this.started = false;
@@ -362,12 +367,20 @@
             this.data = data;
             if (this.data && this.data.length > 0) {
                 arrayUtils.forEach(this.data, function (element) {
+                    let labelsOptions = 0;
+                    for (var i = 0, j = 1; i < 2; i++, j++) {
+                        if (!this.uniqueArcsLabels.includes(element.labels[i])) {
+                            this.uniqueArcsLabels.push(element.labels[i]);
+                            labelsOptions += j;
+                        }
+                    }
                     var arc = new Arc({
                         startX: element.from[0],
                         startY: element.from[1],
                         endX: element.to[0],
                         endY: element.to[1],
                         labels: element.labels,
+                        labelsOptions: labelsOptions,
                         label: this.style.arc.label,
                         font: this.style.arc.font,
                         width: element.arcWidth || this.style.arc.width,
