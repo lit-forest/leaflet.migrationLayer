@@ -16,6 +16,17 @@
                 return color.split(',').splice(0, 3).join(',') +
                     opacity + ')';
             }
+        },
+
+        // Returns +1 or -1: which side of the chord the arc's center goes on.
+        // 'original' always returns +1 (unmodified). Options 'over' and 'under' as noted.
+        getArcDir: function (startX, endX, mode) {
+            if (mode === undefined || mode === 'original' ) {
+                return 1;
+            }
+            var d = endX >= startX ? 1 : -1; // 'over'
+
+            return mode === 'under' ? -d : d;
         }
     };
     var arrayUtils = {
@@ -94,14 +105,19 @@
             var n = (startY + endY) / 2; // 纵轴中点
             var factor = 1.5;
 
-            var centerX = (startY - endY) * factor + m;
-            var centerY = (endX - startX) * factor + n;
+            // +1 when drawing left->right, -1 when drawing right->left.
+            // This places the arc above the chord "outbound" and under "inbound".
+            var dir = utils.getArcDir(startX, endX, options.direction);
+
+            var centerX = (startY - endY) * factor * dir + m;
+            var centerY = (endX - startX) * factor * dir + n;
 
             var radius = Math.sqrt(Math.pow(L / 2, 2) + Math.pow(L * factor, 2));
             var startAngle = Math.atan2(startY - centerY, startX - centerX);
             var endAngle = Math.atan2(endY - centerY, endX - centerX);
 
             // this.L = L;
+            this.dir = dir;
             this.startX = startX;
             this.startY = startY;
             this.endX = endX;
@@ -118,7 +134,7 @@
             this.label = options.label;
             this.font = options.font;
             this.shadowBlur = options.shadowBlur;
-            this.endAngle = endAngle - this.lineWidth / radius; // 让线后退，与箭头结合
+            this.endAngle = endAngle - dir * this.lineWidth / radius; // 让线后退，与箭头结合
         };
 
         A.prototype.draw = function (context) {
@@ -129,7 +145,8 @@
             context.shadowBlur = this.shadowBlur || 2;
 
             context.beginPath();
-            context.arc(this.centerX, this.centerY, this.radius, this.startAngle, this.endAngle, false);
+            // Anti-clockwise when dir === -1
+            context.arc(this.centerX, this.centerY, this.radius, this.startAngle, this.endAngle, this.dir < 0);
             context.stroke();
             context.restore();
 
@@ -206,23 +223,33 @@
             var n = (startY + endY) / 2; // 纵轴中点
             var factor = 1.5;
 
-            var centerX = (startY - endY) * factor + m;
-            var centerY = (endX - startX) * factor + n;
+            // Spark path above the chord "outbound", below "inbound".
+            var dir = options.dir !== undefined
+                ? options.dir
+                : utils.getArcDir(startX, endX, options.direction);
+
+            var centerX = (startY - endY) * factor * dir + m;
+            var centerY = (endX - startX) * factor * dir + n;
 
             var radius = Math.sqrt(Math.pow(L / 2, 2) + Math.pow(L * factor, 2));
             var startAngle = Math.atan2(startY - centerY, startX - centerX);
             var endAngle = Math.atan2(endY - centerY, endX - centerX);
 
-            // 保证Spark的弧度不超过Math.PI
-            if (startAngle * endAngle < 0) {
-                if (startAngle < 0) {
-                    startAngle += Math.PI * 2;
-                    endAngle += Math.PI * 2;
-                } else {
-                    endAngle += Math.PI * 2;
+            // Unwrap so the sweep from start to end goes in direction dir and is < 2π
+            // (replaces the old "startAngle * endAngle < 0" fix-up)
+            var delta = endAngle - startAngle;
+            if (dir > 0) {
+                while (delta < 0) {
+                    delta += Math.PI * 2;
+                }
+            } else {
+                while (delta > 0) {
+                    delta -= Math.PI * 2;
                 }
             }
+            endAngle = startAngle + delta;
 
+            this.dir = dir;
             this.tailPointsCount = 50; // 拖尾点数
             this.centerX = centerX;
             this.centerY = centerY;
@@ -231,7 +258,12 @@
             this.radius = radius;
             this.lineWidth = options.width || 1;
             this.strokeStyle = options.color || '#fff';
+
+            // Expose control of the Spark speed
             this.factor = 2 / this.radius;
+            this.duration = options.duration || null;
+            this.startTime = null;
+
             this.deltaAngle = (80 / Math.min(this.radius, 400)) / this.tailPointsCount;
             this.trailAngle = this.startAngle;
             this.arcAngle = this.startAngle;
@@ -260,33 +292,54 @@
             // context.shadowBlur = 5;
             context.lineCap = "round";
             context.beginPath();
-            context.arc(this.centerX, this.centerY, this.radius, startAngle, endAngle, false);
+            context.arc(this.centerX, this.centerY, this.radius, startAngle, endAngle, this.dir < 0);
             context.stroke();
             context.restore();
         };
 
-        S.prototype.draw = function (context) {
+        S.prototype.draw = function (context, now) {
+            var dir = this.dir;
             var endAngle = this.endAngle;
-            // 匀速
-            var angle = this.trailAngle + this.factor;
-            var strokeColor = this.strokeStyle;
-            if (this.animateBlur) {
-                this.arcAngle = angle;
-            }
-            this.trailAngle = angle;
-            strokeColor = utils.calculateColor(strokeColor, 0.1);
+            var timeBased = !!this.duration;
 
+            if (timeBased) {
+                // Time-based: position derived from elapsed time
+                if (now === undefined) now = performance.now();
+                if (this.startTime === null) this.startTime = now;
+    
+                var elapsed = now - this.startTime;
+                var progress = (elapsed % this.duration) / this.duration;  // 0..1, loops
+                this.trailAngle = this.startAngle + (endAngle - this.startAngle) * progress;
+    
+                if (elapsed >= this.duration) {
+                    this.animateBlur = false;
+                    this.arcAngle = endAngle;
+                } else {
+                    this.arcAngle = this.trailAngle;
+                }
+            } else {
+                // Frame-based: fixed step per frame
+                // 匀速
+                var angle = this.trailAngle + dir * this.factor;
+                if (this.animateBlur) {
+                    this.arcAngle = angle;
+                }
+                this.trailAngle = angle;
+            }
+
+            var strokeColor = utils.calculateColor(this.strokeStyle, 0.1);
             this.drawArc(context, strokeColor, this.lineWidth, this.startAngle, this.arcAngle);
 
-            // 拖尾效果
+            // 拖尾效
             var count = this.tailPointsCount;
             for (var i = 0; i < count; i++) {
                 var arcColor = utils.calculateColor(this.strokeStyle, 0.3 - 0.3 / count * i);
                 var tailLineWidth = 5;
-                if (this.trailAngle - this.deltaAngle * i > this.startAngle) {
+                var tailAngle = this.trailAngle - dir * this.deltaAngle * i;
+                if (dir * (tailAngle - this.startAngle) > 0) {
                     this.drawArc(context, arcColor,
                         tailLineWidth - tailLineWidth / count * i,
-                        this.trailAngle - this.deltaAngle * i,
+                        tailAngle,
                         this.trailAngle
                     );
                 }
@@ -296,17 +349,18 @@
             context.translate(this.centerX, this.centerY);
             this.marker.x = Math.cos(this.trailAngle) * this.radius;
             this.marker.y = Math.sin(this.trailAngle) * this.radius;
-            this.marker.rotation = this.trailAngle + Math.PI / 2;
+            this.marker.rotation = this.trailAngle + dir * Math.PI / 2;
             this.marker.draw(context);
             context.restore();
 
-            if ((endAngle - this.trailAngle) * 180 / Math.PI < 0.5) {
+            // Frame-based loop reset (time-based mode loops via the modulo above)
+            if (!timeBased && dir * (endAngle - this.trailAngle) * 180 / Math.PI < 0.5) {
                 this.trailAngle = this.startAngle;
                 this.animateBlur = false;
             }
-        };
+         };
 
-        return S;
+         return S;
     })();
 
 
@@ -371,12 +425,14 @@
                         label: this.style.arc.label,
                         font: this.style.arc.font,
                         width: element.arcWidth || this.style.arc.width,
-                        color: element.color
+                        color: element.color,
+                        direction: this.style.arc.direction
                     });
                     var marker = new Marker({
                         x: element.to[0],
                         y: element.to[1],
-                        rotation: arc.endAngle + Math.PI / 2,
+			// Change the marker angle according to arc direction
+                        rotation: arc.endAngle + arc.dir * Math.PI / 2,
                         style: 'arrow',
                         color: element.color,
                         size: element.arcWidth || this.style.arc.width+3,
@@ -397,7 +453,9 @@
                         endY: element.to[1],
                         width: 15,
                         color: element.color,
-                        size: element.arcWidth
+                        size: element.arcWidth,
+                        duration: element.sparkDuration || this.style.spark.duration,
+                        dir: arc.dir
                     });
 
                     this.store.arcs.push(arc);
@@ -448,8 +506,9 @@
             arcLabel: true,
             arcLabelFont: '15px sans-serif',
             Marker: {},
-            Spark: {}
-
+            Spark: {},
+            arcDirection: 'original',
+            sparkDuration: null
         },
         _setOptions: function (obj, options) {
             if (!obj.hasOwnProperty('options')) {
@@ -472,7 +531,11 @@
                 arc: {
                     width: this.options.arcWidth,
                     label: this.options.arcLabel,
-                    font: this.options.arcLabelFont
+                    font: this.options.arcLabelFont,
+                    direction: this.options.arcDirection
+                },
+                spark: {
+                    duration: this.options.sparkDuration
                 }
             } || {};
             this._show = true;
@@ -559,6 +622,7 @@
                         labels: d.labels,
                         value: d.value,
                         color: d.color,
+                        sparkDuration: d.sparkDuration,
                         arcWidth: d.value? parseInt((d.value - minValue) * (maxWidth-1)/(maxValue - minValue)) + 1:this.options.arcWidth
                     }
                 }, this);
